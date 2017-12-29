@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# some variables
-CURRENT_DIRECTORY=$(cd `dirname $0` && pwd)
-
 # check existance of a command passed in arg $1
 check_existence() {
   command -v "$1" > /dev/null 2>&1 \
