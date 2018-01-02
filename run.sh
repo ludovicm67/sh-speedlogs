@@ -16,10 +16,11 @@ check_existence jq
 
 # results of the speedtest
 SPEEDTEST_RESULTS=`speedtest-cli --json 2> /dev/null`
+RES_CODE=$?
 
-# generate a simple JSON
-[[ $? == 0 ]] \
-  && echo "$SPEEDTEST_RESULTS" \
+# if good results
+if [ $RES_CODE -eq 0 ]; then
+  RES_PRINT=`echo "$SPEEDTEST_RESULTS" \
     | jq -r --compact-output \
       '{
         ping: .ping,
@@ -39,17 +40,41 @@ SPEEDTEST_RESULTS=`speedtest-cli --json 2> /dev/null`
           .
         end
       )
-      | from_entries' \
-  || ( \
-      echo "Connection error." 1>&2; \
-      CURRENT_DATE_UTC=`date -u +%FT%T.%6NZ`
-      echo '{
-        "ping":-1,
-        "down":0,
-        "up":0,
-        "time":"'"$CURRENT_DATE_UTC"'"
-      }' | jq -r --compact-output .; \
-      exit 1;
-    )
+      | from_entries'`
+# in case of bad results
+else
+  echo "Connection error." 1>&2
+  CURRENT_DATE_UTC=`date -u +%FT%T.%6NZ`
+  RES_PRINT=`echo '{
+    "ping":-1,
+    "down":0,
+    "up":0,
+    "time":"'"$CURRENT_DATE_UTC"'"
+  }' | jq -r --compact-output '.'`
+fi
 
-exit 0
+# we print final results
+echo "$RES_PRINT"
+
+# if a file was specified in arg, we print log the content directly in it
+if [ $# -eq 1 ]; then
+
+  # if the file exists
+  if [ -f "$1" ]; then
+    CLEAN_FILE=`jq -r --compact-output '.' "$1" 2> /dev/null`
+    if [ -z "$CLEAN_FILE" ]; then
+      echo "[$RES_PRINT]" > "$1"
+    else
+      echo "$RES_PRINT" > "/tmp/ludovicm67_speedlogs.$$"
+      RES_FILE=`jq -s -r --compact-output \
+        '.[0][.[0] | length] = .[1] | .[0]' \
+        "$1" "/tmp/ludovicm67_speedlogs.$$"`
+      rm -f "/tmp/ludovicm67_speedlogs.$$"
+      echo "$RES_FILE" > "$1"
+    fi
+  else
+    echo "[$RES_PRINT]" > "$1"
+  fi
+fi
+
+exit $RES_CODE
