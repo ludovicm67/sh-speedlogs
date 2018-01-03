@@ -42,3 +42,13 @@ If an error is returned, the return code will differ from `0`.
 An error message will be printed in *stderr*, so you can debug your app. The
 most common error is a network connection error, when you aren't connected to
 the Internet.
+
+## Run it all *X* minutes and store results in a log file
+
+The unique argument the script allows if the location of the log file.
+
+To log all 15 minutes, just use `sudo crontab -e` and append the following line:
+
+`*/15 * * * * /path/to/sh-speedlogs/run.sh /var/log/ludovicm67_speedlogs.json`
+
+and it will works perfectly!
