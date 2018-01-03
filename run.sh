@@ -56,12 +56,13 @@ fi
 # we print final results
 echo "$RES_PRINT"
 
-# if a file was specified in arg, we print log the content directly in it
+# if a file was specified in arg, we log the content directly in it
 if [ $# -eq 1 ]; then
 
   # if the file exists
   if [ -f "$1" ]; then
     CLEAN_FILE=`jq -r --compact-output '.' "$1" 2> /dev/null`
+    # if the file if not well-formed
     if [ -z "$CLEAN_FILE" ]; then
       echo "[$RES_PRINT]" > "$1"
     else
@@ -72,9 +73,11 @@ if [ $# -eq 1 ]; then
       rm -f "/tmp/ludovicm67_speedlogs.$$"
       echo "$RES_FILE" > "$1"
     fi
+  # if the file doesn't exist
   else
     echo "[$RES_PRINT]" > "$1"
   fi
 fi
 
+# we exit with the good exit code
 exit $RES_CODE
