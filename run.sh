@@ -24,7 +24,7 @@ RES_CODE=$?
 # if good results
 if [ $RES_CODE -eq 0 ]; then
   RES_PRINT=`echo "$SPEEDTEST_RESULTS" \
-    | jq -r --compact-output \
+    | jq -r -c \
       '{
         ping: .ping,
         down: .download,
@@ -53,7 +53,7 @@ else
     "down":0,
     "up":0,
     "time":"'"$CURRENT_DATE_UTC"'"
-  }' | jq -r --compact-output '.'`
+  }' | jq -r -c '.'`
 fi
 
 # we print final results
@@ -64,13 +64,13 @@ if [ $# -eq 1 ]; then
 
   # if the file exists
   if [ -f "$1" ]; then
-    CLEAN_FILE=`jq -r --compact-output '.[-'"$CONF_MAX_ITEMS"':]' "$1" 2> /dev/null`
+    CLEAN_FILE=`jq -r -c '.[-'"$CONF_MAX_ITEMS"':]' "$1" 2> /dev/null`
     # if the file if not well-formed
     if [ -z "$CLEAN_FILE" ]; then
       echo "[$RES_PRINT]" > "$1"
     else
       echo "$RES_PRINT" > "/tmp/ludovicm67_speedlogs.$$"
-      RES_FILE=`jq -s -r --compact-output \
+      RES_FILE=`jq -s -r -c \
         '.[0][.[0] | length] = .[1] | .[0]' \
         "$1" "/tmp/ludovicm67_speedlogs.$$"`
       rm -f "/tmp/ludovicm67_speedlogs.$$"
