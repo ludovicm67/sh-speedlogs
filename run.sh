@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# configuration
+CONF_MAX_ITEMS=3000
+
 # check existance of a command passed in arg $1
 check_existence() {
   command -v "$1" > /dev/null 2>&1 \
@@ -61,7 +64,7 @@ if [ $# -eq 1 ]; then
 
   # if the file exists
   if [ -f "$1" ]; then
-    CLEAN_FILE=`jq -r --compact-output '.' "$1" 2> /dev/null`
+    CLEAN_FILE=`jq -r --compact-output '.[-'"$CONF_MAX_ITEMS"':]' "$1" 2> /dev/null`
     # if the file if not well-formed
     if [ -z "$CLEAN_FILE" ]; then
       echo "[$RES_PRINT]" > "$1"
