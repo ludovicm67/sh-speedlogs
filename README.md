@@ -52,3 +52,14 @@ To log all 15 minutes, just use `sudo crontab -e` and append the following line:
 `*/15 * * * * /path/to/sh-speedlogs/run.sh /var/log/ludovicm67_speedlogs.json`
 
 and it will works perfectly!
+
+## See results!
+
+  - using `cat`: `cat /var/log/ludovicm67_speedlogs.json`,
+    but it may be hard to read it,
+
+  - using `jq`: `jq '.' /var/log/ludovicm67_speedlogs.json`,
+    pretty-print with colors the JSON file
+
+  - or you can have a look at https://github.com/ludovicm67/speedlogs-viewer,
+    a tool that display a nice graph of the results, written in PHP.
